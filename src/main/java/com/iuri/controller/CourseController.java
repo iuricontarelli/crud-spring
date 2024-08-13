@@ -2,6 +2,7 @@ package com.iuri.controller;
 
 import java.util.List;
 
+import org.hibernate.Session;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iuri.model.Course;
 import com.iuri.repository.CourseRepository;
 
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -33,10 +35,15 @@ import lombok.AllArgsConstructor;
 public class CourseController {
 
     private final CourseRepository courseRepository;
+    private final EntityManager entityManager;
 
     @CrossOrigin
     @GetMapping
     public @ResponseBody List<Course> list() {
+        // Adicionado como opção do @Where que foi depreciado
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("statusFilter").setParameter("status", "Ativo");
+
         return courseRepository.findAll();
     }
 
